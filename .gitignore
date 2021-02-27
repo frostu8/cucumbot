@@ -25,3 +25,6 @@ cucumbot-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+# token
+/config/token.exs
