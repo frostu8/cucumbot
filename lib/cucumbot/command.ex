@@ -5,9 +5,11 @@ defmodule Cucumbot.Command do
 
   @prefix "!"
 
-  use Nostrum.Consumer
+  @commands [
+    Cucumbot.About
+  ]
 
-  alias Nostrum.Api
+  use Nostrum.Consumer
 
   alias Cucumbot.Command.Context, as: CommandCtx
 
@@ -22,22 +24,18 @@ defmodule Cucumbot.Command do
         :ignore
       command ->
         # handle command
-        handle_command(command)
+        case @commands |> Enum.find(fn handler -> handler.name === command.cmd end) do
+          nil ->
+            # ignore nonexistant command
+            :ignore
+          handler ->
+            # execute handler
+            handler.execute(command)
+        end
     end
   end
 
   def handle_event(_event) do
     :noop
-  end
-
-  @spec handle_command(CommandCtx.t) :: no_return
-  def handle_command(context) do
-    case context |> Map.get(:cmd) do
-      "about" ->
-        Api.create_message(context.msg.channel_id, "Cucumbot")
-      _ ->
-        # ignore non-existant command
-        :ignore
-    end
   end
 end
