@@ -5,6 +5,10 @@ defmodule Cucumbot.Util.String do
   def find_char(str, test), do: find_char(str, 0, test)
 
   @spec find_char(String.t, non_neg_integer, char_fn) :: non_neg_integer | nil
+  def find_char("", _idx, _test) do
+    nil
+  end
+
   def find_char(str, idx, test) do
     <<char::utf8, rest::binary>> = str
 
