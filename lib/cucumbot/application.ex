@@ -10,7 +10,9 @@ defmodule Cucumbot.Application do
     children = [
       # Starts a worker by calling: Cucumbot.Worker.start_link(arg)
       # {Cucumbot.Worker, arg}
-      Cucumbot.Command
+      Cucumbot.Repo,
+      Cucumbot.Command,
+      Cucumbot.Levelling,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
