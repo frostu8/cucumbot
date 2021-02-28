@@ -18,20 +18,23 @@ defmodule Cucumbot.Command do
   end
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    case CommandCtx.parse(msg, @prefix) do
-      nil ->
-        # skip non command
-        :ignore
-      command ->
-        # handle command
-        case @commands |> Enum.find(fn handler -> handler.name === command.cmd end) do
-          nil ->
-            # ignore nonexistant command
-            :ignore
-          handler ->
-            # execute handler
-            handler.execute(command)
-        end
+    # only handle if commands are being executed in a guild
+    if msg.guild_id do
+      case CommandCtx.parse(msg, @prefix) do
+        nil ->
+          # skip non command
+          :ignore
+        command ->
+          # handle command
+          case @commands |> Enum.find(fn handler -> handler.name === command.cmd end) do
+            nil ->
+              # ignore nonexistant command
+              :ignore
+            handler ->
+              # execute handler
+              handler.execute(command)
+          end
+      end
     end
   end
 
