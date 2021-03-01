@@ -1,13 +1,8 @@
 defmodule Cucumbot.Levelling do
-  use Nostrum.Consumer
-
   alias Cucumbot.Levelling.Store
 
-  def start_link do
-    Consumer.start_link(__MODULE__)
-  end
-
-  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
+  @spec handle_message(Nostrum.Struct.Message.t) :: no_return
+  def handle_message(msg) do
     alias Cucumbot.Util.Snowflake
 
     # do not handle exp for bots
@@ -28,10 +23,6 @@ defmodule Cucumbot.Levelling do
         end
       end
     end
-  end
-
-  def handle_event(_event) do
-    :noop
   end
 
   # LEVELLING LOGIC

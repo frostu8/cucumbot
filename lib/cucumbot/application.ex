@@ -12,7 +12,6 @@ defmodule Cucumbot.Application do
       # {Cucumbot.Worker, arg}
       Cucumbot.Repo,
       Cucumbot.Command,
-      Cucumbot.Levelling,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
