@@ -6,7 +6,8 @@ defmodule Cucumbot.Command do
   @prefix "!"
 
   @commands [
-    Cucumbot.About
+    Cucumbot.About,
+    Cucumbot.Levelling.RankCommand
   ]
 
   use Nostrum.Consumer
@@ -23,7 +24,8 @@ defmodule Cucumbot.Command do
       case CommandCtx.parse(msg, @prefix) do
         nil ->
           # skip non command
-          :ignore
+          # add EXP though
+          Cucumbot.Levelling.handle_message(msg)
         command ->
           # handle command
           case @commands |> Enum.find(fn handler -> handler.name === command.cmd end) do
