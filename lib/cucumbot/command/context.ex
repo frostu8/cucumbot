@@ -52,6 +52,53 @@ defmodule Cucumbot.Command.Context do
     end
   end
 
+  @doc """
+  Gets the next argument, and attempts to resolve it into a user.
+
+  Returns `nil` if there was no next argument, but instead returns `:error` if
+  the user could not be found.
+  """
+  @spec next_user(t) :: {Nostrum.Struct.User.t | nil, t} | {:error, String.t, t}
+  def next_user(ctx) do
+    case next_arg(ctx) do
+      {nil, ctx} -> 
+        {nil, ctx}
+      {member_raw, ctx} ->
+        # got an argument
+        case resolve_mention(member_raw) do
+          nil ->
+            # this is not a mention or an id
+            raise "Unimplemented"
+          id ->
+            # get user by id
+            case Nostrum.Cache.UserCache.get(id) do
+              {:ok, user} ->
+                {user, ctx}
+              {:error, _reason} ->
+                {:error, member_raw, ctx}
+            end
+        end
+    end
+  end
+
+  @spec resolve_mention(String.t) :: integer | nil
+  defp resolve_mention(mention) do
+    import String, only: [starts_with?: 2, ends_with?: 2]
+
+    trim = if starts_with?(mention, "<@!") and ends_with?(mention, ">") do
+      String.slice(mention, 3..-2)
+    else
+      mention
+    end
+
+    case Integer.parse(trim) do
+      :error ->
+        nil
+      {id, _str} ->
+        id
+    end
+  end
+
   @spec next_arg_raw(String.t) :: {String.t, String.t | nil}
   defp next_arg_raw(args) do
     # find the next whitespace
