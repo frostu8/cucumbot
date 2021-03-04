@@ -4,23 +4,17 @@ defmodule Cucumbot.Score do
 
   @spec handle_message(Nostrum.Struct.Message.t) :: no_return
   def handle_message(msg) do
-    # do not handle exp for bots
-    unless msg.author.bot do
-      # only handle exp for guilds
-      if msg.guild_id do
-        # get user's exp
-        dscore = UserScore.get_or_default(msg.author.id, msg.guild_id)
+    # get user's exp
+    dscore = UserScore.get_or_default(msg.author.id, msg.guild_id)
 
-        timestamp = Snowflake.creation_time_unix(msg.id);
+    timestamp = Snowflake.creation_time_unix(msg.id);
 
-        # compare timestamp
-        if dscore.cooldown < timestamp do
-          # give exp
-          UserScore.update(dscore, 
-            dscore.score + rng_score(), 
-            make_cooldown(timestamp))
-        end
-      end
+    # compare timestamp
+    if dscore.cooldown < timestamp do
+      # give exp
+      UserScore.update(dscore, 
+        dscore.score + rng_score(), 
+        make_cooldown(timestamp))
     end
   end
 

@@ -16,17 +16,14 @@ defmodule Cucumbot.CommandInvoker do
 
   @spec handle_message(Nostrum.Struct.Message.t) :: :ok | :ignore
   def handle_message(msg) do
-    # only handle if commands are being executed in a guild
-    if msg.guild_id do
-      case strip_prefix(msg.content, @prefix) do
-        nil ->
-          # skip non command
-          :ignore
-        command ->
-          {cmd, args} = Arguments.next_arg(command)
+    case strip_prefix(msg.content, @prefix) do
+      nil ->
+        # skip non command
+        :ignore
+      command ->
+        {cmd, args} = Arguments.next_arg(command)
 
-          dispatch(cmd, args, msg)
-      end
+        dispatch(cmd, args, msg)
     end
   end
 
