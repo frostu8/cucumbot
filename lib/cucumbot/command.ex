@@ -1,10 +1,14 @@
 defmodule Cucumbot.Command do
-  @type opts :: [
+  @moduledoc """
+  Interface for command modules to implement.
+  """
+
+  @type cmdspec :: [
     name: String.t
   ]
 
   @doc false
-  @callback opts() :: opts
+  @callback info() :: cmdspec
 
   @doc """
   Executes the command.
@@ -20,7 +24,7 @@ defmodule Cucumbot.Command do
       @behaviour Cucumbot.Command
 
       @impl true
-      def opts do
+      def info do
         unquote(opts)
       end
 
