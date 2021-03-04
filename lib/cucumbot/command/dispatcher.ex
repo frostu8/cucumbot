@@ -33,7 +33,10 @@ defmodule Cucumbot.Command.Dispatcher do
   @spec dispatch(String.t, CommandArgs.t, Nostrum.Struct.Message.t) :: no_return
   defp dispatch(cmd, args, msg) do
     # handle command
-    case @commands |> Enum.find(fn handler -> Keyword.fetch!(handler.opts(), :name) === cmd end) do
+    command = @commands |> Enum.find(
+      fn handler -> Keyword.fetch!(handler.info(), :name) === cmd end)
+
+    case command do
       nil ->
         # ignore nonexistant command
         :ignore
