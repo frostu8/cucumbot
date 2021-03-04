@@ -1,23 +1,22 @@
-defmodule Cucumbot.Levelling do
-  alias Cucumbot.Levelling.Store
+defmodule Cucumbot.Score do
+  alias Cucumbot.Schema.UserScore
+  alias Cucumbot.Util.Snowflake
 
   @spec handle_message(Nostrum.Struct.Message.t) :: no_return
   def handle_message(msg) do
-    alias Cucumbot.Util.Snowflake
-
     # do not handle exp for bots
     unless msg.author.bot do
       # only handle exp for guilds
       if msg.guild_id do
         # get user's exp
-        dscore = Store.get_or_default(msg.author.id, msg.guild_id)
+        dscore = UserScore.get_or_default(msg.author.id, msg.guild_id)
 
         timestamp = Snowflake.creation_time_unix(msg.id);
 
         # compare timestamp
         if dscore.cooldown < timestamp do
           # give exp
-          Store.update(dscore, 
+          UserScore.update(dscore, 
             dscore.score + rng_score(), 
             make_cooldown(timestamp))
         end
@@ -25,8 +24,6 @@ defmodule Cucumbot.Levelling do
     end
   end
 
-  # LEVELLING LOGIC
-  
   @doc """
   Calculates a slighty random difference for obtaining score.
   """
@@ -51,6 +48,9 @@ defmodule Cucumbot.Levelling do
     25*level*level + 100*level
   end
 
+  @doc """
+  Makes a cooldown relative to a given UNIX timestamp.
+  """
   @spec make_cooldown(integer) :: integer
   def make_cooldown(timestamp) do
     # cooldown is 20 seconds

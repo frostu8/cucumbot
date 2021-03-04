@@ -1,4 +1,4 @@
-defmodule Cucumbot.About do
+defmodule Cucumbot.Cogs.About do
   use Cucumbot.Command, name: "about"
 
   def execute(_args, msg) do

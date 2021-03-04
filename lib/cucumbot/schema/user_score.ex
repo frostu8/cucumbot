@@ -1,4 +1,4 @@
-defmodule Cucumbot.Levelling.Store do
+defmodule Cucumbot.Schema.UserScore do
   use Ecto.Schema
 
   @primary_key false

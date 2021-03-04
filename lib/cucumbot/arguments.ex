@@ -1,4 +1,8 @@
-defmodule Cucumbot.Command.Arguments do
+defmodule Cucumbot.Arguments do
+  @moduledoc """
+  Set of tools for interacting with command arguments.
+  """
+
   import Cucumbot.Util.String
 
   @type t :: String.t | nil

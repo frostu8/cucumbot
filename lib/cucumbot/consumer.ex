@@ -7,10 +7,10 @@ defmodule Cucumbot.Consumer do
 
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
     # handle exp
-    Cucumbot.Levelling.handle_message(msg)
+    Cucumbot.Score.handle_message(msg)
 
     # attempt to dispatch command
-    Cucumbot.Command.Dispatcher.handle_message(msg)
+    Cucumbot.CommandInvoker.handle_message(msg)
   end
 
   def handle_event(_event) do

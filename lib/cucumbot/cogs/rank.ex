@@ -1,14 +1,14 @@
-defmodule Cucumbot.Levelling.RankCommand do
+defmodule Cucumbot.Cogs.Rank do
   use Cucumbot.Command, name: "rank"
 
-  alias Cucumbot.Command.Arguments, as: CommandArgs
-  alias Cucumbot.Levelling.Store
+  alias Cucumbot.Arguments
+  alias Cucumbot.Schema.UserScore
   alias Cucumbot.Util
 
   alias Nostrum.Api
 
   def execute(args, msg) do
-    {user_mention, _args} = CommandArgs.next_arg(args)
+    {user_mention, _args} = Arguments.next_arg(args)
 
     user_id = case user_mention do
       nil ->
@@ -33,11 +33,11 @@ defmodule Cucumbot.Levelling.RankCommand do
               allowed_mentions: :none)
           {:ok, member} ->
             # got member
-            score = Store.get_or_default(user_id, msg.guild_id).score
+            score = UserScore.get_or_default(user_id, msg.guild_id).score
 
             Api.create_message(msg.channel_id,
               "member \"#{member.nick || member.user.username}\" is " <> 
-                "lv#{Cucumbot.Levelling.score_to_level(score)} " <> 
+                "lv#{Cucumbot.Score.score_to_level(score)} " <> 
                   "with #{score} score")
         end
     end

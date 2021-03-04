@@ -1,18 +1,18 @@
-defmodule Cucumbot.Command.Dispatcher do
+defmodule Cucumbot.CommandInvoker do
   @moduledoc """
-  Dispatches commands.
+  The command invoker listens for commands and runs them.
   """
 
   @prefix "!"
 
   @commands [
-    Cucumbot.About,
-    Cucumbot.Levelling.RankCommand
+    Cucumbot.Cogs.About,
+    Cucumbot.Cogs.Rank
   ]
 
   use Nostrum.Consumer
 
-  alias Cucumbot.Command.Arguments, as: CommandArgs
+  alias Cucumbot.Arguments
 
   @spec handle_message(Nostrum.Struct.Message.t) :: :ok | :ignore
   def handle_message(msg) do
@@ -23,14 +23,14 @@ defmodule Cucumbot.Command.Dispatcher do
           # skip non command
           :ignore
         command ->
-          {cmd, args} = CommandArgs.next_arg(command)
+          {cmd, args} = Arguments.next_arg(command)
 
           dispatch(cmd, args, msg)
       end
     end
   end
 
-  @spec dispatch(String.t, CommandArgs.t, Nostrum.Struct.Message.t) :: no_return
+  @spec dispatch(String.t, Arguments.t, Nostrum.Struct.Message.t) :: no_return
   defp dispatch(cmd, args, msg) do
     # handle command
     command = @commands |> Enum.find(
