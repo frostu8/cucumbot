@@ -1,35 +1,18 @@
 defmodule Cucumbot.Levelling.RankCommand do
-  use Cucumbot.Command.Handler, name: "rank"
+  use Cucumbot.Command, name: "rank"
 
-  alias Cucumbot.Command.Context, as: CommandCtx
+  alias Cucumbot.Command.Arguments, as: CommandArgs
   alias Cucumbot.Levelling.Store
 
   alias Nostrum.Api
   alias Nostrum.Cache.UserCache
 
-  def execute(ctx) do
-    case CommandCtx.next_user(ctx) do
-      {nil, ctx} -> 
-        user = Nostrum.Cache.UserCache.get!(ctx.msg.author.id)
-
-        get_user_level(ctx, user)
-      {:error, arg, ctx} -> 
-        Api.create_message!(ctx.msg.channel_id,
-          "Could not find user #{arg}!")
-      {user, ctx} -> 
-        get_user_level(ctx, user)
+  def execute(args, msg) do
+    user_id = case CommandArgs.next_arg(args) do
+      {nil, args} ->
+        msg.author.id
+      {user_mention, args} ->
+        Cucumbot.Util.User.resolve_mention(user_mention)
     end
-  end
-
-  defp get_user_level(ctx, user) do
-    # get user
-    dscore = Store.get_or_default(user.id, ctx.msg.guild_id)
-
-    # get level
-    level = Cucumbot.Levelling.score_to_level(dscore.score)
-
-    # print results
-    Api.create_message!(ctx.msg.channel_id, 
-      "#{user.username} is at lv#{level} with #{dscore.score} score.")
   end
 end

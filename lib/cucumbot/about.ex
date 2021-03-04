@@ -1,9 +1,9 @@
 defmodule Cucumbot.About do
-  use Cucumbot.Command.Handler, name: "about"
+  use Cucumbot.Command, name: "about"
 
-  def execute(ctx) do
+  def execute(_args, msg) do
     version = Application.spec(:cucumbot, :vsn) |> to_string()
 
-    Nostrum.Api.create_message(ctx.msg.channel_id, "Running Cucumbot #{version}")
+    Nostrum.Api.create_message(msg.channel_id, "Running Cucumbot #{version}")
   end
 end

@@ -11,7 +11,7 @@ defmodule Cucumbot.Application do
       # Starts a worker by calling: Cucumbot.Worker.start_link(arg)
       # {Cucumbot.Worker, arg}
       Cucumbot.Repo,
-      Cucumbot.Command,
+      Cucumbot.Consumer,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

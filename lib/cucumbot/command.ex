@@ -1,46 +1,35 @@
 defmodule Cucumbot.Command do
-  @moduledoc """
-  Command handling logic.
-  """
-
-  @prefix "!"
-
-  @commands [
-    Cucumbot.About,
-    Cucumbot.Levelling.RankCommand
+  @type opts :: [
+    name: String.t
   ]
 
-  use Nostrum.Consumer
+  @doc false
+  @callback opts() :: opts
 
-  alias Cucumbot.Command.Context, as: CommandCtx
+  @doc """
+  Executes the command.
+  """
+  @callback execute(Cucumbot.Command.Arguments.t, Nostrum.Struct.Message.t) :: no_return
 
-  def start_link do
-    Consumer.start_link(__MODULE__)
-  end
-
-  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    # only handle if commands are being executed in a guild
-    if msg.guild_id do
-      case CommandCtx.parse(msg, @prefix) do
-        nil ->
-          # skip non command
-          # add EXP though
-          Cucumbot.Levelling.handle_message(msg)
-        command ->
-          # handle command
-          case @commands |> Enum.find(fn handler -> handler.name === command.cmd end) do
-            nil ->
-              # ignore nonexistant command
-              :ignore
-            handler ->
-              # execute handler
-              handler.execute(command)
-          end
-      end
+  defmacro __using__(opts) do
+    unless opts |> Keyword.has_key?(:name) do
+      raise ArgumentError.exception("No command name specified!")
     end
-  end
 
-  def handle_event(_event) do
-    :noop
+    quote location: :keep do
+      @behaviour Cucumbot.Command
+
+      @impl true
+      def opts do
+        unquote(opts)
+      end
+
+      @impl true
+      def execute(_args, _msg) do
+        :ok
+      end
+
+      defoverridable execute: 2
+    end
   end
 end
