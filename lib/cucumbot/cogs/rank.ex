@@ -1,45 +1,47 @@
 defmodule Cucumbot.Cogs.Rank do
-  use Cucumbot.Command, name: "rank"
+  use Cucumbot.Command
 
-  alias Cucumbot.Arguments
   alias Cucumbot.Schema.UserScore
   alias Cucumbot.Util
 
-  alias Nostrum.Api
+  def cmdspec do
+    %{ 
+      name: "rank",
+      description: "gets the rank of a user",
+      options: [
+        %{
+          type: 6, 
+          name: "user", 
+          description: "the user to check the rank for.",
+          required: false
+        }
+      ]
+    }
+  end
 
-  def execute(args, msg) do
-    {user_mention, _args} = Arguments.next_arg(args)
-
-    user_id = case user_mention do
+  def execute(intr) do
+    user_id = case get_member(intr.data, "user") do
       nil ->
-        msg.author.id
-      user_mention ->
-        Util.User.resolve_mention(user_mention)
+        intr.member.user.id
+      user ->
+        user
     end
 
-    case user_id do
-      nil ->
-        # could not resolve mention
-        Api.create_message(msg.channel_id,
-          content: "could not find user #{user_mention}",
-          allowed_mentions: :none)
-      user_id ->
-        # get member
-        case Util.User.get_member(msg.guild_id, user_id) do
-          {:error, why} ->
-            # could not find user
-            Api.create_message(msg.channel_id,
-              content: "could not find user #{user_mention}",
-              allowed_mentions: :none)
-          {:ok, member} ->
-            # got member
-            score = UserScore.get_or_default(user_id, msg.guild_id).score
+    # get member
+    case Util.User.get_member(intr.guild_id, user_id) do
+      {:error, why} ->
+        # could not find user
+        respond(intr, "failed to find user: #{why}")
+      {:ok, member} ->
+        # got member
+        score = UserScore.get_or_default(user_id, intr.guild_id).score
 
-            Api.create_message(msg.channel_id,
-              "member \"#{member.nick || member.user.username}\" is " <> 
-                "lv#{Cucumbot.Score.score_to_level(score)} " <> 
-                  "with #{score} score")
-        end
+        respond(
+          intr,
+          "member \"#{member.nick || member.user.username}\" is " <> 
+          "lv#{Cucumbot.Score.score_to_level(score)} " <> 
+          "with #{score} score"
+        )
     end
   end
 end

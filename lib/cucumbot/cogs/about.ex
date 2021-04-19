@@ -1,9 +1,24 @@
 defmodule Cucumbot.Cogs.About do
-  use Cucumbot.Command, name: "about"
+  use Cucumbot.Command
 
-  def execute(_args, msg) do
+  def cmdspec do
+    %{ 
+      name: "about",
+      description: "gets information about the bot"
+    }
+  end
+
+  def execute(intr) do
     version = Application.spec(:cucumbot, :vsn) |> to_string()
 
-    Nostrum.Api.create_message(msg.channel_id, "Running Cucumbot #{version}")
+    Nostrum.Api.create_interaction_response(
+      intr, 
+      %{
+        type: 4,
+        data: %{
+          content: "Running Cucumbot #{version}"
+        }
+      }
+    )
   end
 end

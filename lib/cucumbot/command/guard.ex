@@ -10,18 +10,18 @@ defmodule Cucumbot.Command.Guard do
   Executes the guard, returning `nil` if the command should execute, or a
   string denoting the reason why it cannot.
   """
-  @callback guard(Cucumbot.Command.Arguments.t, Nostrum.Struct.Message.t) :: nil | String.t
+  @callback guard(Nostrum.Struct.Interaction.t) :: nil | String.t
 
   defmacro __using__(_opts) do
     quote location: :keep do
       @behaviour Cucumbot.Command.Guard
 
       @impl true
-      def guard(_args, _msg) do
+      def guard(msg) do
         nil
       end
 
-      defoverridable guard: 2
+      defoverridable guard: 1
     end
   end
 end
