@@ -54,7 +54,8 @@ defmodule Cucumbot.Schema.UserScore do
   def update(user, score, cooldown) do
     Repo.insert(
       changeset(user, %{score: score, cooldown: cooldown}), 
-      on_conflict: :replace_all)
+      on_conflict: :replace_all,
+      conflict_target: [:score, :cooldown])
   end
 
   @doc """
@@ -64,7 +65,8 @@ defmodule Cucumbot.Schema.UserScore do
   def update_score(user, score) do
     Repo.insert(
       changeset(user, %{score: score}), 
-      on_conflict: :replace_all)
+      on_conflict: :replace_all,
+      conflict_target: :score)
   end
 
   defp default do
