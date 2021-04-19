@@ -39,12 +39,7 @@ defmodule Cucumbot.Schema.UserScore do
   """
   @spec get_or_default(integer, integer) :: t
   def get_or_default(user_id, guild_id) do
-    case get(user_id, guild_id) do
-      nil ->
-        %__MODULE__{default() | user_id: user_id, guild_id: guild_id}
-      result ->
-        result
-    end
+    get(user_id, guild_id) || Repo.insert!(%__MODULE__{default | user_id: user_id, guild_id: guild_id})
   end
 
   @doc """
@@ -52,10 +47,7 @@ defmodule Cucumbot.Schema.UserScore do
   """
   @spec update(t, non_neg_integer, integer) :: no_return
   def update(user, score, cooldown) do
-    Repo.insert(
-      changeset(user, %{score: score, cooldown: cooldown}), 
-      on_conflict: :replace_all,
-      conflict_target: [:score, :cooldown])
+    Repo.update!(changeset(user, %{score: score, cooldown: cooldown}))
   end
 
   @doc """
@@ -63,10 +55,7 @@ defmodule Cucumbot.Schema.UserScore do
   """
   @spec update_score(t, non_neg_integer) :: no_return
   def update_score(user, score) do
-    Repo.insert(
-      changeset(user, %{score: score}), 
-      on_conflict: :replace_all,
-      conflict_target: :score)
+    Repo.update!(changeset(user, %{score: score}))
   end
 
   defp default do
