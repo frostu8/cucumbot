@@ -4,7 +4,8 @@ defmodule Cucumbot.Command do
   """
 
   @type cmdspec :: [
-    name: String.t
+    name: String.t,
+    guards: [Cucumbot.Command.Guard.t]
   ]
 
   @doc false
@@ -14,6 +15,28 @@ defmodule Cucumbot.Command do
   Executes the command.
   """
   @callback execute(Cucumbot.Command.Arguments.t, Nostrum.Struct.Message.t) :: no_return
+
+  @doc """
+  Executes all guards, returning the first error.
+  """
+  @spec guards(atom, Cucumbot.Command.Arguments.t, Nostrum.Struct.Message.t) :: :ok | String.t
+  def guards(cmd, args, msg) do
+    case Keyword.fetch(cmd.info(), :guards) do
+      {:ok, guards} ->
+        # execute guards
+        case Enum.find_value(guards, fn guard -> guard.guard(args, msg) end) do
+          nil ->
+            # no problems!
+            :ok
+          error ->
+            # propogate error
+            error
+        end
+      :error ->
+        # guards do not exist for this command
+        :ok
+    end
+  end
 
   defmacro __using__(opts) do
     unless opts |> Keyword.has_key?(:name) do

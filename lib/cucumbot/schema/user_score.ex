@@ -57,6 +57,16 @@ defmodule Cucumbot.Schema.UserScore do
       on_conflict: :replace_all)
   end
 
+  @doc """
+  Updates a score only.
+  """
+  @spec update_score(t, non_neg_integer) :: no_return
+  def update_score(user, score) do
+    Repo.insert(
+      changeset(user, %{score: score}), 
+      on_conflict: :replace_all)
+  end
+
   defp default do
     %__MODULE__{score: 0, cooldown: 0}
   end

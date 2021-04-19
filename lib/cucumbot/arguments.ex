@@ -36,4 +36,61 @@ defmodule Cucumbot.Arguments do
         end
     end
   end
+
+  @doc """
+  Gets the next argument of a command, and attempts to convert it to an 
+  integer.
+  """
+  @spec next_int(t) :: {integer | nil, t} | {:error, String.t, t}
+  def next_int(nil) do
+    {nil, nil}
+  end
+
+  def next_int(args) do
+    # get next arg
+    case next_arg(args) do
+      {nil, args} -> 
+        {nil, args}
+      {arg, args} ->
+        # try to parse it
+        case Integer.parse(arg) do
+          {int, _rest} ->
+            {int, args}
+          :error ->
+            {:error, arg, args}
+        end
+    end
+  end
+
+  @doc """
+  Gets the next argument of a command, and attempts to resolve it into a
+  `Nostrum.Struct.Guild.Member`.
+  """
+  @spec next_member(t, Nostrum.Snowflake.t) :: {Nostrum.Struct.Guild.Member | nil, t} | {:error, String.t, t}
+  def next_member(nil, _ctx) do
+    {nil, nil}
+  end
+
+  def next_member(args, ctx) do
+    case next_arg(args) do
+      {nil, args} ->
+        {nil, args}
+      {mention, args} ->
+        # resolve mention
+        case Cucumbot.Util.User.resolve_mention(mention) do
+          nil ->
+            {:error, mention, args}
+          user ->
+            # get member
+            case Cucumbot.Util.User.get_member(ctx, user) do
+              {:error, _why} ->
+                # could not find user
+                {:error, mention, args}
+              {:ok, member} ->
+                # found user
+                {member, args}
+            end
+        end
+    end
+  end
 end

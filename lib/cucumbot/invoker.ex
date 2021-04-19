@@ -3,10 +3,12 @@ defmodule Cucumbot.Invoker do
 
   @commands [
     Cucumbot.Cogs.About,
+    Cucumbot.Cogs.Exp,
     Cucumbot.Cogs.Rank
   ]
 
   alias Cucumbot.Arguments
+  alias Cucumbot.Command
 
   @spec handle_message(Nostrum.Struct.Message.t) :: no_return
   def handle_message(msg) do
@@ -32,8 +34,16 @@ defmodule Cucumbot.Invoker do
         # ignore nonexistant command
         :ignore
       handler ->
-        # execute handler
-        handler.execute(args, msg)
+        # check guards
+        case Command.guards(command, args, msg) do
+          :ok ->
+            # no problemo!
+            # execute handler
+            handler.execute(args, msg)
+          error ->
+            # print error
+            Nostrum.Api.create_message(msg.channel_id, content: error)
+        end
     end
   end
 end
