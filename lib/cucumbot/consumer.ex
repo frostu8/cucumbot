@@ -14,7 +14,7 @@ defmodule Cucumbot.Consumer do
         Cucumbot.Score.handle_message(msg)
 
         # attempt to dispatch command
-        Cucumbot.CommandInvoker.handle_message(msg)
+        Cucumbot.Invoker.handle_message(msg)
       end
     end
   end
