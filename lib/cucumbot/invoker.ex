@@ -36,7 +36,7 @@ defmodule Cucumbot.Invoker do
   def register_commands do
     @commands |> Enum.each(fn command ->
       Nostrum.Api.create_guild_application_command(
-        683483117473759249,
+        363453410491629568,
         command.cmdspec()
       )
     end)
